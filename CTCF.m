@@ -34,11 +34,11 @@ for k = 1:NumberOfZPoints
     NumberofROIs = size(gfpResults,1);
     % Go through each ROI
     for n = 1:NumberofROIs
-        % GFP: integrated density - (area of selected cell * mean fluorescence of background readings)
+        % GFP: (integrated density - (area of selected cell * mean fluorescence of background readings)) / area
         gfpCTCF{k}(n) = (gfpResults(n,find(strcmp(gfpNames,'IntDen'))) - ...
             (gfpResults(n,find(strcmp(gfpNames,'Area'))) * mean(gfpResults(end-2:end,find(strcmp(gfpNames,'Mean')))))) / ...
             gfpResults(n,find(strcmp(gfpNames,'Area')));
-        % RFP: integrated density - (area of selected cell * mean fluorescence of background readings)
+        % RFP: (integrated density - (area of selected cell * mean fluorescence of background readings)) / area
         rfpCTCF{k}(n) = (rfpResults(n,find(strcmp(rfpNames,'IntDen'))) - ...
             (rfpResults(n,find(strcmp(rfpNames,'Area'))) * mean(rfpResults(end-2:end,find(strcmp(rfpNames,'Mean')))))) / ...
             rfpResults(n,find(strcmp(rfpNames,'Area')));
