@@ -12,7 +12,7 @@
 %   - Requires download of Bio-Formats Package to ImageJ .jars folder:
 %       https://www.openmicroscopy.org/bio-formats/downloads/
 %   - Requires download of the most updated NetCDF java source files (.zip) to ImageJ .jars folder:
-%       https://www.openmicroscopy.org/bio-formats/downloads/
+%       https://downloads.unidata.ucar.edu/netcdf/
 %   - ImageJ setup prior to running code: 
 %       - spatially calibrate images for correct "Area" measurement for CTCF
 %       - calibrate gray values of images for correct "Mean" measurement for CTCF
