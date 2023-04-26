@@ -4,7 +4,7 @@
 %   1) Save Z-stacks as individual .tifs (for each channel)
 %   2) Select and save ROIs (to be applied to all channels that will be analyzed) 
 %   3) Measure and save results of user-selected parameters for each ROI (for each Z-plane for each channel) 
-%   4) Calculate the corrected total cell fluorescence (CTCF) for each channel and performs ratiometric analysis
+%   4) Calculate the corrected total cell fluorescence (CTCF) for each channel and perform ratiometric analysis
 
 % NOTES:
 %   - Requires installation of MIJ and ImageJ from MATLAB File Exchange: 
