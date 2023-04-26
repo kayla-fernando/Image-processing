@@ -10,7 +10,7 @@ function varargout = CTCF(filepath,NumberOfZPoints)
 %   NumberOfZPoints: from image metadata
 %
 % OUTPUTS:
-%   ratio: cell array containing the ratios of RFP/GFP fluorescence for all ROIs at all Z-planes after corecting for total cell fluorescence
+%   ratio: cell array containing the ratios of RFP/GFP fluorescence for all ROIs at all Z-planes after correcting for total cell fluorescence
 %   gfpCTCF: cell array containing CTCF values for all ROIs at all Z-planes in the GFP channel
 %   rfpCTCF: cell array containing CTCF values for all ROIs at all Z-planes in the RFP channel
 
