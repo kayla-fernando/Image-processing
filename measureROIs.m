@@ -31,7 +31,7 @@ sample = 1; % 1 = EBC side; 2 = non-EBC side
 NumberOfZPoints = 21; % from image metadata 
 analysisPath = 'Y:\\'; % directory to image analysis folder
 applicationPath = 'Y:\\'; % directory to image processing applications
-fullPath = [analysisPath mouse '\' mouse '_' num2str(sample)]; % used later for CTCF calculation
+filePath = [analysisPath mouse '\' mouse '_' num2str(sample)]; % used later for CTCF calculation
 
 vers = ['R' version('-release')];
 javaaddpath(['C:\Program Files\MATLAB\' vers '\java\mij.jar']);
@@ -93,7 +93,7 @@ end
 
 %% Calculate CTCF and do ratiometric analysis
 
-[ratio,gfpCTCF,rfpCTCF] = CTCF(fullPath,NumberOfZPoints);
+[ratio,gfpCTCF,rfpCTCF] = CTCF(filePath,NumberOfZPoints);
 
 MIJ.closeAllWindows
 MIJ.exit
