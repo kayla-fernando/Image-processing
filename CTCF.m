@@ -14,7 +14,7 @@ function varargout = CTCF(filepath,NumberOfZPoints)
 %   gfpCTCF: cell array containing CTCF values for all ROIs at all Z-planes in the GFP channel
 %   rfpCTCF: cell array containing CTCF values for all ROIs at all Z-planes in the RFP channel
 
-% Written by Kayla Fernando (4/26/23)
+% Written by Kayla Fernando (kayla.fernando@duke.edu) (4/26/23)
 
 % Size of cell array will reflect number of Z-planes
 % Each array element will contain the measurements of all ROIs selected at that Z-plane
