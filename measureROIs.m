@@ -26,11 +26,11 @@
 
 close all; clear all; clc
 
-mouse = 'test';
+mouse = 'mouse';
 sample = 1; % 1 = EBC side; 2 = non-EBC side
 NumberOfZPoints = 21; % from image metadata 
-analysisPath = 'Y:\\home\kayla\Histology analysis\'; % directory to image analysis folder
-applicationPath = 'Y:\\home\kayla\Image processing'; % directory to image processing applications
+analysisPath = 'Y:\\'; % directory to image analysis folder
+applicationPath = 'Y:\\'; % directory to image processing applications
 fullPath = [analysisPath mouse '\' mouse '_' num2str(sample)]; % used later for CTCF calculation
 
 vers = ['R' version('-release')];
@@ -43,25 +43,25 @@ disp('Open an .ims file')
 
 % Make stacks folder to store the Z-stacks for each channel
 mkdir([analysisPath mouse '\' mouse '_' num2str(sample) '\stacks']);
-disp('Save channels in Histology analysis')
+disp('Save channels in image analysis folder')
     MIJ.run('Save')
 
 %% Manually select ROIs at each Z-plane that will be applied to all channels
 
-% Make ROIs folder to store the ROI coordinates for each Z-plane 
+% Make rois folder to store the ROI coordinates for each Z-plane 
 mkdir([analysisPath mouse '\' mouse '_' num2str(sample) '\rois']);
 newFolder = ([analysisPath mouse '\' mouse '_' num2str(sample) '\rois']);
 cd(newFolder)
 disp('Select and save ROIs at each Z-plane')
     MIJ.run('ROI Manager...') % check Show All
 
-% Select ROIs at this Z-plane, then save the RoiSet to the ROIs folder
+% Select ROIs at this Z-plane, then save the RoiSet to the rois folder
 % Clear values and move to the next Z-plane
 
 %% Measure values of all selected ROIs at each Z-plane for the current channel
 
 % Analyze the current active channel in ImageJ and set folder naming conventions
-analyzeChannel = 'GFP';
+channel = 'GFP';
 
 % Separate current channel into individual .tifs
 newFolder = ([analysisPath mouse '\' mouse '_' num2str(sample) '\stacks']);
@@ -75,8 +75,8 @@ for k = 1:NumberOfZPoints
 end 
 
 % Make results folder for current channel
-mkdir([analysisPath mouse '\' mouse '_' num2str(sample) '\' analyzeChannel 'results']);
-newFolder = ([analysisPath mouse '\' mouse '_' num2str(sample) '\' analyzeChannel 'results']);
+mkdir([analysisPath mouse '\' mouse '_' num2str(sample) '\' channel 'results']);
+newFolder = ([analysisPath mouse '\' mouse '_' num2str(sample) '\' channel 'results']);
 cd(newFolder)
 for k = 1:NumberOfZPoints
     disp(['Open Z-plane number ' num2str(k)])
