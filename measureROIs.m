@@ -95,5 +95,17 @@ end
 
 [ratio,gfpCTCF,rfpCTCF] = CTCF(filePath,NumberOfZPoints);
 
+% Make histograms of RFP/GFP ratio for each Z-plane
+for k = 1:length(ratio)
+    figure; 
+    histogram(ratio{k},'BinWidth',0.5); 
+    hold on; 
+    title(['Z-plane ' num2str(k)]);
+    xlabel('CTCF RFP/CTCF GFP ratio');
+    ylabel('# of ROIs');
+    xline(1); 
+    hold off;
+end
+
+% Close ImageJ
 MIJ.closeAllWindows
-MIJ.exit
