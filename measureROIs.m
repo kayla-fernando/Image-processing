@@ -109,3 +109,4 @@ end
 
 % Close ImageJ
 MIJ.closeAllWindows
+MIJ.exit
