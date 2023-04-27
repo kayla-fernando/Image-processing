@@ -1,5 +1,5 @@
 # Image-processing
-Analysis scripts for Z-stacks
+Analysis scripts for confocal Z-stacks
 
 Image processing software (FIJI/ImageJ) is required. If using ImageJ, download the Bio-Formats Package (https://www.openmicroscopy.org/bio-formats/downloads/) and the most updated NetCDF java source file (.zip) (https://downloads.unidata.ucar.edu/netcdf/) to the ImageJ .jars folder 
 
