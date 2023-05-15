@@ -29,7 +29,7 @@ for k = 1:NumberOfZPoints
         gfpNames = detectImportOptions([filepath '\GFPresults\Results' num2str(k) '.csv']).VariableNames;
     % Get the RFP results
     rfpResults = readmatrix([filepath '\RFPresults\Results' num2str(k) '.csv']); % get the RFP results
-        rfpNames = detectImportOptions([filepath '\GFPresults\Results' num2str(k) '.csv']).VariableNames;
+        rfpNames = detectImportOptions([filepath '\RFPresults\Results' num2str(k) '.csv']).VariableNames;
     % How many ROIs are at this Z-plane
     NumberofROIs = size(gfpResults,1);
     % Go through each ROI
