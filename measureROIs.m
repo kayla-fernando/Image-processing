@@ -38,13 +38,18 @@ javaaddpath(['C:\Program Files\MATLAB\' vers '\java\mij.jar']);
 javaaddpath(['C:\Program Files\MATLAB\' vers '\java\ij.jar']);
 MIJ.start(java.lang.String(applicationPath)) % loads macros
 disp('Open an .ims file')
-    MIJ.run('Bio-Formats Importer') 
-    MIJ.run('Split Channels')
+    MIJ.run('Bio-Formats Importer') % Data Browser; Group files with similar names; Dimensions; Series 3
 
 % Make stacks folder to store the Z-stacks for each channel
 mkdir([analysisPath mouse '\' mouse '_' num2str(sample) '\stacks']);
-disp('Save channels in image analysis folder')
-    MIJ.run('Save')
+disp('Save channels in image analysis folder and ignore the big scary exception that will pop up')
+    MIJ.run('Bio-Formats Exporter') % Name appropriately; Tagged Image File Format; Write each channel to a separate file 
+
+%% Each channel will be saved as a grayscale image stack, pseudo-color each channel accordingly
+
+MIJ.run("RGB Color");
+MIJ.run("Make Composite");
+MIJ.run("Split Channels");
 
 %% Manually select ROIs at each Z-plane that will be applied to all channels
 
@@ -56,7 +61,7 @@ disp('Select and save ROIs at each Z-plane')
     MIJ.run('ROI Manager...') % check Show All
 
 % Select ROIs at this Z-plane, then save the RoiSet to the rois folder
-% Clear values and move to the next Z-plane
+% Clear values and uncheck Show All before moving to the next Z-plane
 
 %% Measure values of all selected ROIs at each Z-plane for the current channel
 
@@ -84,8 +89,8 @@ for k = 1:NumberOfZPoints
     disp(['Open RoiSet' num2str(k)])
         MIJ.run('Open...') 
     disp(['Save results of Z-plane number ' num2str(k) ...
-        ', then clear Results, clear ROI Manager, and close current Z-plane'])
-        MIJ.run('measureROIs') % custom macro
+        ', then clear Results, clear ROI Manager, and close current Z-plane']) % Select last ROI; Measure; Save As
+%        MIJ.run('measureROIs') % custom macro
     pause
 end
 
@@ -98,7 +103,7 @@ end
 % Make histograms of RFP/GFP ratio for each Z-plane
 for k = 1:length(ratio)
     figure; 
-    histogram(ratio{k},'BinWidth',0.5); 
+    histogram(ratio{k},'BinWidth',1); 
     hold on; 
     title(['Z-plane ' num2str(k)]);
     xlabel('CTCF RFP/CTCF GFP ratio');
