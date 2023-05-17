@@ -2,9 +2,10 @@
 
 % A semi-automated Z-stack analysis pipeline to:
 %   1) Save Z-stacks as individual .tifs (for each channel)
-%   2) Select and save ROIs (to be applied to all channels that will be analyzed) 
-%   3) Measure and save results of user-selected parameters for each ROI (for each Z-plane for each channel) 
-%   4) Calculate the corrected total cell fluorescence (CTCF) for each channel and perform ratiometric analysis
+%   2) Manually set the threshold and generate binary mask for each Z-plane for each channel
+%   3) Select and save ROIs from masks (to be applied to all channels that will be analyzed) 
+%   4) Measure and save results of user-selected parameters for each ROI (for each Z-plane for each channel) 
+%   5) Calculate the corrected total cell fluorescence (CTCF) for each channel and perform ratiometric analysis
 
 % NOTES:
 %   - Requires installation of MIJ and ImageJ from MATLAB File Exchange: 
@@ -19,8 +20,9 @@
 %       - set results in ROI Manager to include "Integrated Density" measurement for CTCF
 %       - directory to custom macro "measureROIs.ijm" to do the measurements using ROI Manager
 %   - Run each section separately
+%   - Wand tool for cell ROI selection, Oval tool for background ROI selection
 
-% Written by Kayla Fernando (kayla.fernando@duke.edu) (4/26/23)
+% Written by Kayla Fernando (kayla.fernando@duke.edu) (5/17/23)
 
 %% Set paths and use MIJ to upload image to ImageJ
 
@@ -42,6 +44,8 @@ disp('Open an .ims file')
 
 % Make stacks folder to store the Z-stacks for each channel
 mkdir([analysisPath mouse '\' mouse '_' num2str(sample) '\stacks']);
+newFolder = ([analysisPath mouse '\' mouse '_' num2str(sample) '\stacks']);
+cd(newFolder)
 disp('Save channels in image analysis folder and ignore the big scary exception that will pop up')
     MIJ.run('Bio-Formats Exporter') % Name appropriately; Tagged Image File Format; Write each channel to a separate file 
 
@@ -51,38 +55,49 @@ MIJ.run("RGB Color");
 MIJ.run("Make Composite");
 MIJ.run("Split Channels");
 
-%% Manually select ROIs at each Z-plane that will be applied to all channels
+%% Separate each channel into individual .tifs
+
+newFolder = ([analysisPath mouse '\' mouse '_' num2str(sample) '\stacks']);
+cd(newFolder)
+MIJ.run('Stack to Images')
+
+for k = 1:NumberOfZPoints
+    MIJ.run('Save')
+    MIJ.run('Close')
+end 
+              
+%% Create binary mask and manually select ROIs at each Z-plane that will be applied to all channels
 
 % Make rois folder to store the ROI coordinates for each Z-plane 
 mkdir([analysisPath mouse '\' mouse '_' num2str(sample) '\rois']);
 newFolder = ([analysisPath mouse '\' mouse '_' num2str(sample) '\rois']);
 cd(newFolder)
-disp('Select and save ROIs at each Z-plane')
-    MIJ.run('ROI Manager...') % check Show All
-
-% Select ROIs at this Z-plane, then save the RoiSet to the rois folder
-% Clear values and uncheck Show All before moving to the next Z-plane
+        
+for k = 1:NumberOfZPoints
+    disp(['Open Z-plane number ' num2str(k)])
+        MIJ.run('Open...') 
+        MIJ.run('Threshold...') % manually adjust threshold and Apply
+    pause
+    disp('Save mask as separate file')
+        MIJ.run('Convert to Mask')
+        MIJ.run('Tiff...')
+    pause
+    disp('Select and save cell and background ROIs from this mask')
+    disp('Clear values and uncheck Show All before continuing')
+        MIJ.run('ROI Manager...') % check Show All
+    pause
+end
 
 %% Measure values of all selected ROIs at each Z-plane for the current channel
 
 % Analyze the current active channel in ImageJ and set folder naming conventions
 channel = 'GFP';
 
-% Separate current channel into individual .tifs
-newFolder = ([analysisPath mouse '\' mouse '_' num2str(sample) '\stacks']);
-cd(newFolder)
-MIJ.run('Stack to Images')
-
-% Save each image
-for k = 1:NumberOfZPoints
-    MIJ.run('Save')
-    MIJ.run('Close')
-end 
-
 % Make results folder for current channel
 mkdir([analysisPath mouse '\' mouse '_' num2str(sample) '\' channel 'results']);
 newFolder = ([analysisPath mouse '\' mouse '_' num2str(sample) '\' channel 'results']);
 cd(newFolder)
+              
 for k = 1:NumberOfZPoints
     disp(['Open Z-plane number ' num2str(k)])
         MIJ.run('Open...') 
@@ -90,7 +105,6 @@ for k = 1:NumberOfZPoints
         MIJ.run('Open...') 
     disp(['Save results of Z-plane number ' num2str(k) ...
         ', then clear Results, clear ROI Manager, and close current Z-plane']) % Select last ROI; Measure; Save As
-%        MIJ.run('measureROIs') % custom macro
     pause
 end
 
@@ -103,7 +117,7 @@ end
 % Make histograms of RFP/GFP ratio for each Z-plane
 for k = 1:length(ratio)
     figure; 
-    histogram(ratio{k},'BinWidth',1); 
+    histogram(ratio{k},'BinWidth',0.5); 
     hold on; 
     title(['Z-plane ' num2str(k)]);
     xlabel('CTCF RFP/CTCF GFP ratio');
