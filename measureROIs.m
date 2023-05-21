@@ -46,7 +46,7 @@ disp('Open an .ims file')
 mkdir([analysisPath mouse '\' mouse '_' num2str(sample) '\stacks']);
 newFolder = ([analysisPath mouse '\' mouse '_' num2str(sample) '\stacks']);
 cd(newFolder)
-disp('Save channels in image analysis folder and ignore the big scary exception that will pop up')
+disp('Save as TIFF in image analysis folder and ignore the big scary exception that will pop up')
     MIJ.run('Bio-Formats Exporter') % Name appropriately; Tagged Image File Format; Write each channel to a separate file 
 
 %% Each channel will be saved as a grayscale image stack, pseudo-color each channel accordingly
@@ -75,16 +75,18 @@ cd(newFolder)
         
 for k = 1:NumberOfZPoints
     disp(['Open Z-plane number ' num2str(k)])
+    disp('Manually adjust threshold and Apply')
         MIJ.run('Open...') 
-        MIJ.run('Threshold...') % manually adjust threshold and Apply
+        MIJ.run('Threshold...')
     pause
     disp('Save mask as separate file')
         MIJ.run('Convert to Mask')
         MIJ.run('Tiff...')
     pause
-    disp('Select and save cell and background ROIs from this mask')
-    disp('Clear values and uncheck Show All before continuing')
-        MIJ.run('ROI Manager...') % check Show All
+    disp('Watershed, then select and save cell and background ROIs from this mask')
+    disp('Clear values and save watershed mask before continuing')
+        MIJ.run('Watershed')
+        MIJ.run('ROI Manager...')
     pause
 end
 
