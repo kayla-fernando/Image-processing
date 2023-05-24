@@ -136,11 +136,11 @@ end
 % Make histograms of RFP/GFP ratio for each Z-plane
 for k = 1:length(ratio)
     figure; 
-    histogram(ratio{k},'BinWidth',0.5); 
+    histogram(ratio{k},'BinWidth',0.5,'FaceColor','k'); 
     hold on; 
     title(['Z-plane ' num2str(k)]);
-    xlabel('CTCF RFP/CTCF GFP ratio');
-    ylabel('# of ROIs');
+    xlabel('CTCF_{RFP} / CTCF_{GFP}');
+    ylabel('# ROIs');
     xline(1); 
     hold off;
 end
