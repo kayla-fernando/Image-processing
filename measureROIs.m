@@ -26,7 +26,9 @@
 
 %% Set paths and use MIJ to upload image to ImageJ
 
-close all; clear all; clc
+close all 
+clear all 
+clc
 
 mouse = 'mouse';
 sample = 1; % 1 = EBC side; 2 = non-EBC side
@@ -55,7 +57,7 @@ MIJ.run("RGB Color");
 MIJ.run("Make Composite");
 MIJ.run("Split Channels");
 
-%% Separate each channel into individual .tifs
+%% Separate each channel into individual .tifs and make a copy that will be used for making masks
 
 newFolder = ([analysisPath mouse '\' mouse '_' num2str(sample) '\stacks']);
 cd(newFolder)
@@ -63,6 +65,9 @@ MIJ.run('Stack to Images')
 
 for k = 1:NumberOfZPoints
     MIJ.run('Save')
+    MIJ.run('Duplicate...')
+    MIJ.run('Save')
+    MIJ.run('Close')
     MIJ.run('Close')
 end 
               
@@ -74,18 +79,30 @@ newFolder = ([analysisPath mouse '\' mouse '_' num2str(sample) '\rois']);
 cd(newFolder)
         
 for k = 1:NumberOfZPoints
-    disp(['Open Z-plane number ' num2str(k)])
+    disp(['Open *copy* of GFP Z-plane number ' num2str(k)])
+        MIJ.run('Open...')
+    disp('Manually adjust brightness and contrast and Apply')   
+        MIJ.run('Brightness/Contrast...') % okay to update LUT
+    pause
+    disp(['Open *copy* of RFP Z-plane number ' num2str(k)])
+        MIJ.run('Open...')
+    disp('Manually adjust brightness and contrast and Apply')   
+        MIJ.run('Brightness/Contrast...') % okay to update LUT
+    pause
+    MIJ.run('Merge Channels...')
+    MIJ.run('RGB Color')
+    MIJ.run('8-bit')
+    MIJ.run('Gaussian Blur...') % sigma = 1.25
     disp('Manually adjust threshold and Apply')
-        MIJ.run('Open...') 
         MIJ.run('Threshold...')
     pause
-    disp('Save mask as separate file')
+    disp(['Watershed, then save as mask' num2str(k)])
         MIJ.run('Convert to Mask')
+        MIJ.run('Watershed')
         MIJ.run('Tiff...')
     pause
-    disp('Watershed, then select and save cell and background ROIs from this mask')
-    disp('Clear values and save watershed mask before continuing')
-        MIJ.run('Watershed')
+    disp('Select and save cell and background ROIs from this mask')
+    disp('Clear values before continuing')
         MIJ.run('ROI Manager...')
     pause
 end
@@ -101,7 +118,7 @@ newFolder = ([analysisPath mouse '\' mouse '_' num2str(sample) '\' channel 'resu
 cd(newFolder)
               
 for k = 1:NumberOfZPoints
-    disp(['Open Z-plane number ' num2str(k)])
+    disp(['Open *original* Z-plane number ' num2str(k)])
         MIJ.run('Open...') 
     disp(['Open RoiSet' num2str(k)])
         MIJ.run('Open...') 
