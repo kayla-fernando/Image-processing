@@ -31,35 +31,51 @@ clear all
 clc
 
 mouse = 'mouse';
+slide = 1; % slide number
+slice = 1; % slice number
 sample = 1; % 1 = EBC side; 2 = non-EBC side
+condition = 'unstained'; % stained or unstained
 NumberOfZPoints = 21; % from image metadata 
 analysisPath = 'Y:\\'; % directory to image analysis folder
 applicationPath = 'Y:\\'; % directory to image processing applications
-filePath = [analysisPath mouse '\' mouse '_' num2str(sample)]; % used later for CTCF calculation
+filePath = [analysisPath mouse ' ' condition '\' mouse '_' num2str(slide) '_slice' num2str(slice) '_' num2str(sample)]; % used later for CTCF calculation
 
 vers = ['R' version('-release')];
 javaaddpath(['C:\Program Files\MATLAB\' vers '\java\mij.jar']);
 javaaddpath(['C:\Program Files\MATLAB\' vers '\java\ij.jar']);
 MIJ.start(java.lang.String(applicationPath)) % loads macros
 disp('Open an .ims file')
-    MIJ.run('Bio-Formats Importer') % Data Browser; Group files with similar names; Dimensions; Series 3
+    MIJ.run('Bio-Formats Importer') 
+    % Data Browser
+    % Disable file stitching
+    % Series 3
 
 % Make stacks folder to store the Z-stacks for each channel
-mkdir([analysisPath mouse '\' mouse '_' num2str(sample) '\stacks']);
-newFolder = ([analysisPath mouse '\' mouse '_' num2str(sample) '\stacks']);
+mkdir([filePath '\stacks']);
+newFolder = ([filePath '\stacks']);
 cd(newFolder)
 disp('Save as TIFF in image analysis folder and ignore the big scary exception that will pop up')
-    MIJ.run('Bio-Formats Exporter') % Name appropriately; Tagged Image File Format; Write each channel to a separate file 
+    MIJ.run('Bio-Formats Exporter') 
+    % Same name as original file 
+    % Tagged Image File Format
+    % Write each channel to a separate file 
 
 %% Each channel will be saved as a grayscale image stack, pseudo-color each channel accordingly
+
+% Load each channel .tif, then run this section
+% C0 - GFP; C1 - RFP; C2 - DAPI (order of channels from imaging protocol)
+% Save as and rename as "gfp" and "rfp"
+% Can delete grayscale .tifs
 
 MIJ.run("RGB Color");
 MIJ.run("Make Composite");
 MIJ.run("Split Channels");
 
-%% Separate each channel into individual .tifs and make a copy that will be used for making masks
+%% Separate each channel's planes into individual .tifs and make copies for masks
 
-newFolder = ([analysisPath mouse '\' mouse '_' num2str(sample) '\stacks']);
+% Load a channel, then run this section
+
+newFolder = ([filePath '\stacks']);
 cd(newFolder)
 MIJ.run('Stack to Images')
 
@@ -73,12 +89,15 @@ end
               
 %% Create binary mask and manually select ROIs at each Z-plane that will be applied to all channels
 
+% Desired range of Z-planes
+ZRange = 1:5;
+
 % Make rois folder to store the ROI coordinates for each Z-plane 
-mkdir([analysisPath mouse '\' mouse '_' num2str(sample) '\rois']);
-newFolder = ([analysisPath mouse '\' mouse '_' num2str(sample) '\rois']);
+mkdir([filePath '\rois']);
+newFolder = ([filePath '\rois']);
 cd(newFolder)
         
-for k = 1:NumberOfZPoints
+for k = ZRange(1):ZRange(end)
     disp(['Open *copy* of GFP Z-plane number ' num2str(k)])
         MIJ.run('Open...')
     disp('Manually adjust brightness and contrast and Apply')   
@@ -101,7 +120,7 @@ for k = 1:NumberOfZPoints
         MIJ.run('Watershed')
         MIJ.run('Tiff...')
     pause
-    disp('Select and save cell and background ROIs from this mask')
+    disp(['Select and save cell and background ROIs as RoiSet' num2str(k)])
     disp('Clear values before continuing')
         MIJ.run('ROI Manager...')
     pause
@@ -113,16 +132,16 @@ end
 channel = 'GFP';
 
 % Make results folder for current channel
-mkdir([analysisPath mouse '\' mouse '_' num2str(sample) '\' channel 'results']);
-newFolder = ([analysisPath mouse '\' mouse '_' num2str(sample) '\' channel 'results']);
+mkdir([filePath '\' channel 'results']);
+newFolder = ([filePath '\' channel 'results']);
 cd(newFolder)
               
-for k = 1:NumberOfZPoints
-    disp(['Open *original* Z-plane number ' num2str(k)])
+for k = ZRange(1):ZRange(end)
+    disp(['Open *original* ' channel ' Z-plane number ' num2str(k)])
         MIJ.run('Open...') 
     disp(['Open RoiSet' num2str(k)])
         MIJ.run('Open...') 
-    disp(['Save results of Z-plane number ' num2str(k) ...
+    disp(['Save in ' channel 'results as Results' num2str(k) ...
         ', then clear Results, clear ROI Manager, and close current Z-plane']) % Select last ROI; Measure; Save As
     pause
 end
@@ -131,7 +150,7 @@ end
 
 %% Calculate CTCF and do ratiometric analysis
 
-[ratio,gfpCTCF,rfpCTCF] = CTCF(filePath,NumberOfZPoints);
+[ratio,gfpCTCF,rfpCTCF] = CTCF(filePath,ZRange);
 
 % Make histograms of RFP/GFP ratio for each Z-plane
 for k = 1:length(ratio)
