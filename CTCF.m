@@ -1,4 +1,4 @@
-function varargout = CTCF(filepath,NumberOfZPoints)
+function varargout = CTCF(filepath,ZRange)
 % Calculates the corrected total cell fluorescence (CTCF) for all ROIs at 
 % all Z-planes, then performs ratiometric analysis to see the RFP/GFP ratio 
 % to use as a readout of ISR state
@@ -7,7 +7,7 @@ function varargout = CTCF(filepath,NumberOfZPoints)
 %
 % INPUTS:
 %   filepath: path to image analysis folders
-%   NumberOfZPoints: from image metadata
+%   ZRange: desired range of Z-planes
 %
 % OUTPUTS:
 %   ratio: cell array containing the ratios of RFP/GFP fluorescence for all ROIs at all Z-planes after correcting for total cell fluorescence
@@ -18,12 +18,12 @@ function varargout = CTCF(filepath,NumberOfZPoints)
 
 % Size of cell array will reflect number of Z-planes
 % Each array element will contain the measurements of all ROIs selected at that Z-plane
-gfpCTCF = cell(1,NumberOfZPoints);
-rfpCTCF = cell(1,NumberOfZPoints);
-ratio = cell(1,NumberOfZPoints);
+gfpCTCF = cell(1,numel(ZRange));
+rfpCTCF = cell(1,numel(ZRange));
+ratio = cell(1,numel(ZRange));
 
 % For each Z-plane
-for k = 1:NumberOfZPoints
+for k = ZRange(1):ZRange(end)
     % Get the GFP results
     gfpResults = readmatrix([filepath '\GFPresults\Results' num2str(k) '.csv']); 
         gfpNames = detectImportOptions([filepath '\GFPresults\Results' num2str(k) '.csv']).VariableNames;
