@@ -63,11 +63,11 @@ non_PCs = [];
 
 %% Make EBC PCs, non-EBC PCs, & non-PCs histograms
 
-h1 = histogram(EBC_PCs,'BinWidth',0.1,'FaceColor','k'); hold on; title('EBC PCs');
+figure; histogram(EBC_PCs,'BinWidth',0.1,'FaceColor','k'); hold on; title('EBC PCs');
 xlabel('CTCF_{RFP} / CTCF_{GFP}'); ylabel('# ROIs'); xline(1); xlim([0 2]); hold off;
 
-h2 = histogram(nonEBC_PCs,'BinWidth',0.1,'FaceColor','k'); hold on; title('Non-EBC PCs');
+figure; histogram(nonEBC_PCs,'BinWidth',0.1,'FaceColor','k'); hold on; title('Non-EBC PCs');
 xlabel('CTCF_{RFP} / CTCF_{GFP}'); ylabel('# ROIs'); xline(1); xlim([0 2]); hold off;
 
-h3 = histogram(non_PCs,'BinWidth',0.1,'FaceColor','k'); hold on; title('Non-PCs');
+figure; histogram(non_PCs,'BinWidth',0.1,'FaceColor','k'); hold on; title('Non-PCs');
 xlabel('CTCF_{RFP} / CTCF_{GFP}'); ylabel('# ROIs'); xline(1); xlim([0 2]); hold off;
